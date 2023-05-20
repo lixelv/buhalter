@@ -4,16 +4,18 @@ from aiogram import executor
 from url import *
 from db import DB
 
+# need in environ TELEGRAM and PORT
+
 d = DB('data.sqlite3')
 
 @dp.message_handler(commands=['start', 'help'])
 async def start(message: Message):
-    kb = currency if not d.user_exist(message.from_user.id) else None
+    kb = None if d.user_exist(message.from_user.id) else currency
     await bot.send_message(
         message.from_user.id,
         'Привет ' + message.from_user.first_name + ' я <strong>Ваш бухгалтер</strong>\nЯ был разработан @simeonlimon, при возникновении проблем обращайтесь',
         parse_mode='HTML',
-        reply_markup=currency)
+        reply_markup=kb)
 
 @dp.message_handler(commands=['plus', 'minus'])
 async def plus_minus_value(message: Message):
@@ -39,7 +41,7 @@ async def remove_last(message: Message):
 @dp.callback_query_handler(lambda callback: callback.data in ['$', '€', '₽'])
 async def add_currency(callback: CallbackQuery):
     d.new_user(callback.from_user.id, callback.from_user.first_name, callback.data)
-    await bot.send_message(callback.from_user.id, f'Вы выбрали валюту: {callback.data}\nДобро пожаловать')
+    await callback.message.edit_text(f'Вы выбрали валюту: {callback.data}\nДобро пожаловать')
 
 @dp.callback_query_handler(lambda callback: callback.data in ['day', 'week', 'month', 'year', 'whole_time'])
 async def history_callback(callback: CallbackQuery):
@@ -52,4 +54,4 @@ async def history_callback(callback: CallbackQuery):
     await callback.message.edit_text(msg)
 
 if __name__ == "__main__":
-    webhook_pooling(dp, token, port=8080)
+    webhook_pooling(dp, token, port=environ['PORT'])
