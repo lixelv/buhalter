@@ -5,6 +5,22 @@ class DB:
     def __init__(self, db_name):
         self.connect = sqlite3.connect(db_name)
         self.cursor = self.connect.cursor()
+        self.cursor.execute("""
+CREATE TABLE IF NOT EXISTS user (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    currency TEXT NOT NULL,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP
+    );""")
+        self.cursor.execute("""
+CREATE TABLE IF NOT EXISTS data (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    pm TEXT NOT NULL,
+    value INTEGER NOT NULL,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP
+);""")
+        self.connect.commit()
 
     def user_exist(self, user_id) -> bool:
         result = self.cursor.execute('SELECT id FROM user WHERE id = ?', (user_id,))
