@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS data (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     pm TEXT NOT NULL,
-    value INTEGER NOT NULL,
+    value REAL NOT NULL,
     date DATETIME DEFAULT CURRENT_TIMESTAMP
 );""")
         self.connect.commit()

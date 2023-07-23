@@ -1,4 +1,4 @@
-from webhook import webhook_pooling
+# from webhook import webhook_pooling
 from aiogram.types import Message, CallbackQuery
 from aiogram import executor
 from url import *
@@ -10,22 +10,27 @@ d = DB('data.sqlite3')
 
 @dp.message_handler(commands=['start', 'help'])
 async def start(message: Message):
+    if d.user_exist(message.from_user.id):
+        kb, i = None, ''
+    else:
+        kb, i = currency, '\nВыберете вашу валюту:'
     kb = None if d.user_exist(message.from_user.id) else currency
     await bot.send_message(
         message.from_user.id,
-        'Привет ' + message.from_user.first_name + ' я <strong>Ваш бухгалтер</strong>\nЯ был разработан @simeonlimon, при возникновении проблем обращайтесь',
+        f'Привет {message.from_user.first_name} я <strong>Ваш бухгалтер</strong>. Я был разработан @simeonlimon, при возникновении проблем обращайтесь.{i}',
         parse_mode='HTML',
         reply_markup=kb)
 
-@dp.message_handler(commands=['plus', 'minus'])
+@dp.message_handler(commands=['plus', 'p', 'minus', 'm'])
 async def plus_minus_value(message: Message):
-    if bool(i_n_t(message.get_args())):
-        if message.get_command() == '/plus':
-            d.add_data(message.from_user.id, message.get_args(), pm='plus')
-            await bot.send_message(message.from_user.id, f'Добавлено зачисление в {message.get_args()} {d.currency(message.from_user.id)}')
+    args = convert_to_number(message.get_args())
+    if bool(i_n_t(args)):
+        if message.get_command() in ['/plus', '/p']:
+            d.add_data(message.from_user.id, args, pm='plus')
+            await bot.send_message(message.from_user.id, f'Добавлено зачисление в {args} {d.currency(message.from_user.id)}')
         else:
-            d.add_data(message.from_user.id, message.get_args(), pm='minus')
-            await bot.send_message(message.from_user.id, f'Добавлено расход {message.get_args()} {d.currency(message.from_user.id)}')
+            d.add_data(message.from_user.id, args, pm='minus')
+            await bot.send_message(message.from_user.id, f'Добавлено расход {args} {d.currency(message.from_user.id)}')
     else:
         await bot.send_message(message.from_user.id, 'Вы ввели не число')
 
@@ -50,8 +55,9 @@ async def history_callback(callback: CallbackQuery):
     msg = 'Вот ваша история:\n'
     for _ in data[0]:
         msg += f'{"➕" if _[0] == "plus" else "➖"} {_[1]} {curr}, {_[2]}\n'
-    msg += f'\nБаланс: {data[1]}'
+    msg += f'\nБаланс: {data[1]} {d.currency(callback.from_user.id)}'
     await callback.message.edit_text(msg)
 
 if __name__ == "__main__":
-    webhook_pooling(dp, token, port=environ['PORT'])
+    # webhook_pooling(dp, token, port=port)
+    executor.start_polling(dp, skip_updates=True)
