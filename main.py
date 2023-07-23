@@ -24,7 +24,7 @@ async def start(message: Message):
 @dp.message_handler(commands=['plus', 'p', 'minus', 'm'])
 async def plus_minus_value(message: Message):
     args = convert_to_number(message.get_args())
-    if bool(i_n_t(args)):
+    if bool(args):
         if message.get_command() in ['/plus', '/p']:
             d.add_data(message.from_user.id, args, pm='plus')
             await bot.send_message(message.from_user.id, f'Добавлено зачисление в {args} {d.currency(message.from_user.id)}')

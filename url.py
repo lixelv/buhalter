@@ -10,11 +10,14 @@ bot = Bot(token)
 dp = Dispatcher(bot)
 
 def convert_to_number(s):
-    if re.search(r"[, .]", s):  # если строка содержит пробел, запятую или точку
-        s = re.sub(r"[, ]", ".", s)  # заменить все пробелы и запятые на точку
-        return float(s)
-    else:  # если строка не содержит пробел, запятую или точку
-        return int(s)  # вернуть целое число
+    try:
+        if re.search(r"[, .]", s):  # если строка содержит пробел, запятую или точку
+            s = re.sub(r"[, ]", ".", s)  # заменить все пробелы и запятые на точку
+            return float(s)
+        else:  # если строка не содержит пробел, запятую или точку
+            return int(s)  # вернуть целое число
+    except:
+        return None
 
 
 def unt(lis):
@@ -23,11 +26,6 @@ def unt(lis):
         result.append(_[0])
     return result
 
-def i_n_t(data):
-    try:
-        return int(data)
-    except:
-        return False
 
 def inline_keyboard(list_of_values: list = None, list_of_callback_data: list = None, valcal: bool = False) -> InlineKeyboardMarkup:
     if valcal:
