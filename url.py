@@ -1,8 +1,9 @@
 from aiogram import Bot, Dispatcher
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from os import environ
+from envparse import env
 
-token = environ['TELEGRAM']
+env.read_envfile('.env')
+token = env('TELEGRAM')
 bot = Bot(token)
 dp = Dispatcher(bot)
 
