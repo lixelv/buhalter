@@ -4,7 +4,12 @@ from aiogram import executor
 from time import sleep
 from url import *
 from db import DB
+import signal
+import os
 
+def signal_handler(sig, frame):
+    print("Выход...")
+    os.kill(os.getpid(), signal.SIGTERM)
 # need in environ TELEGRAM and PORT
 
 d = DB('data.sqlite3')
@@ -61,14 +66,11 @@ async def history_callback(callback: CallbackQuery):
 
 if __name__ == "__main__":
     # webhook_pooling(dp, token, port=port)
+    signal.signal(signal.SIGINT, signal_handler)
     while True:
         try:
             executor.start_polling(dp, skip_updates=True)
             
-        except KeyboardInterrupt:
-            print("Выход...")
-            break
-        
         except Exception as e:
             print(e)
             sleep(240)
