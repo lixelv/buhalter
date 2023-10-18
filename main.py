@@ -1,6 +1,7 @@
 # from webhook import webhook_pooling
 from aiogram.types import Message, CallbackQuery
 from aiogram import executor
+from time import sleep
 from url import *
 from db import DB
 
@@ -60,4 +61,10 @@ async def history_callback(callback: CallbackQuery):
 
 if __name__ == "__main__":
     # webhook_pooling(dp, token, port=port)
-    executor.start_polling(dp, skip_updates=True)
+    while True:
+        try:
+            executor.start_polling(dp, skip_updates=True)
+        except Exception as e:
+            print(e)
+            sleep(240)
+            
